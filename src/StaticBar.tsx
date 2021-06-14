@@ -13,7 +13,7 @@ interface StaticBarProps extends BottomTabBarProps {
   icons: Icons[];
 }
 
-export const tabHeight = 56;
+export const TAB_HEIGHT = 56;
 const {width} = Dimensions.get('window');
 
 export default class StaticBar extends React.PureComponent<StaticBarProps> {
@@ -51,7 +51,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
   };
 
   render() {
-    const {state, /*descriptors, */ navigation, value, icons} = this.props;
+    const {/*descriptors, */ state, navigation, value, icons} = this.props;
     return (
       <View style={styles.container}>
         {state.routes.map((route, key) => {
@@ -63,6 +63,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
               ? options.title
               : route.name;*/
 
+          console.log('state.index', state.index, 'key', key);
           const isFocused = state.index === key;
 
           const onPress = () => {
@@ -74,6 +75,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
 
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
+              this.onPress(key);
             }
           };
 
@@ -98,19 +100,12 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
 
           const translateY = activeValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [tabHeight + 10, -18],
+            outputRange: [TAB_HEIGHT + 10, -18],
           });
 
           return (
             <React.Fragment key={key}>
-              <TouchableWithoutFeedback
-                {...{key}}
-                onPress={() => {
-                  this.onPress(key);
-                  onPress();
-                }}
-                onLongPress={onLongPress}
-              >
+              <TouchableWithoutFeedback {...{key}} onPress={onPress} onLongPress={onLongPress}>
                 <Animated.View style={[styles.tab, {opacity}]}>
                   <Icon size={24} name={icons[key].name} color="white" />
                 </Animated.View>
@@ -121,7 +116,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
                   top: -20,
                   width: this.tabWidth,
                   left: this.tabWidth * key,
-                  height: tabHeight,
+                  height: TAB_HEIGHT,
                   justifyContent: 'center',
                   alignItems: 'center',
                   transform: [{translateY}],
@@ -147,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: tabHeight,
+    height: TAB_HEIGHT,
   },
   circle: {
     backgroundColor: 'black',

@@ -2,19 +2,15 @@ import React, {Component} from 'react';
 import {View, Dimensions, Animated, StyleSheet} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import * as shape from 'd3-shape';
-import StaticBar, {Icons, tabHeight as height} from './StaticBar';
+import StaticBar, {Icons, TAB_HEIGHT as HEIGHT} from './StaticBar';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 // import {SafeAreaProvider, Safe} from 'react-native-safe-area-context';
 
-const icons: Icons[] = [
-  {name: 'menu'},
-  {name: 'plus'},
-  {name: 'search'},
-  {name: 'layers'},
-  {name: 'user'},
-];
+const icons: Icons[] = [{name: 'menu'}, {name: 'plus'}, {name: 'search'}];
 
 const {width} = Dimensions.get('window');
+
+const CURVE_WIDTH = 120;
 
 const left = (width: number) =>
   shape
@@ -49,8 +45,8 @@ const right = (width: number, tabWidth: number) =>
     .y(([_, y]) => y)([
     [width + tabWidth, 0],
     [width * 2.5, 0],
-    [width * 2.5, height],
-    [0, height],
+    [width * 2.5, HEIGHT],
+    [0, HEIGHT],
     [0, 0],
   ]);
 
@@ -61,12 +57,15 @@ export default class AppbarBottom extends Component<BottomTabBarProps> {
   render() {
     const {value: translateX} = this;
     const {state} = this.props;
-    const tabWidth = width / state.routes.length;
+    const tabFraction = width / state.routes.length;
     icons.length = state.routes.length;
-    const d = `${left(width)} ${tab(width - (120 - tabWidth) / 2, 120)} ${right(width, width)}`;
+    const d = `${left(width)} ${tab(width - (CURVE_WIDTH - tabFraction) / 2, CURVE_WIDTH)} ${right(
+      width,
+      width,
+    )}`;
     return (
-      <View {...{width, height}} style={{position: 'absolute', bottom: 0}}>
-        <AnimatedSvg width={width * 2.5} {...{height}} style={{transform: [{translateX}]}}>
+      <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
+        <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={{transform: [{translateX}]}}>
           <Path {...{d}} fill="#5723E4" />
         </AnimatedSvg>
         <View style={[StyleSheet.absoluteFill]}>
