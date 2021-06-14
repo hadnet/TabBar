@@ -1,27 +1,29 @@
 import React from 'react';
 import {View, TouchableWithoutFeedback, StyleSheet, Animated, Dimensions} from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
+import {FeatherIconName} from './Feather.type';
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 
-type Tab = {
-  name: string;
+export type Icons = {
+  name: FeatherIconName;
 };
 
-interface StaticBarProps {
-  tabs: Tab[];
+interface StaticBarProps extends BottomTabBarProps {
   value: Animated.Value;
+  icons: Icons[];
 }
 
-export const tabHeight = 64;
+export const tabHeight = 56;
 const {width} = Dimensions.get('window');
 
 export default class StaticBar extends React.PureComponent<StaticBarProps> {
-  tabWidth = width / this.props.tabs.length;
+  tabWidth = width / this.props.state.routes.length;
   values: Animated.Value[] = [];
 
   constructor(props: StaticBarProps) {
     super(props);
-    const {tabs} = this.props;
-    this.values = tabs.map((tab, index) => new Animated.Value(index === 0 ? 1 : 0));
+    const {routes} = this.props.state;
+    this.values = routes.map((route, index) => new Animated.Value(index === 1 ? 1 : 0));
   }
 
   onPress = (index: number) => {
@@ -49,10 +51,39 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
   };
 
   render() {
-    const {tabs, value} = this.props;
+    const {state, /*descriptors, */ navigation, value, icons} = this.props;
     return (
       <View style={styles.container}>
-        {tabs.map(({name}, key) => {
+        {state.routes.map((route, key) => {
+          /*const {options} = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+              ? options.title
+              : route.name;*/
+
+          const isFocused = state.index === key;
+
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
+
           const activeValue = this.values[key];
 
           const opacity = value.interpolate({
@@ -67,30 +98,37 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
 
           const translateY = activeValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [tabHeight + 10, 0],
+            outputRange: [tabHeight + 10, -18],
           });
 
           return (
-            <React.Fragment {...{key}}>
-              <TouchableWithoutFeedback {...{key}} onPress={() => this.onPress(key)}>
+            <React.Fragment key={key}>
+              <TouchableWithoutFeedback
+                {...{key}}
+                onPress={() => {
+                  this.onPress(key);
+                  onPress();
+                }}
+                onLongPress={onLongPress}
+              >
                 <Animated.View style={[styles.tab, {opacity}]}>
-                  <Icon size={20} {...{name}} color="silver" />
+                  <Icon size={24} name={icons[key].name} color="white" />
                 </Animated.View>
               </TouchableWithoutFeedback>
               <Animated.View
                 style={{
                   position: 'absolute',
+                  top: -20,
                   width: this.tabWidth,
                   left: this.tabWidth * key,
                   height: tabHeight,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  top: -8,
                   transform: [{translateY}],
                 }}
               >
                 <View style={styles.circle}>
-                  <Icon size={32} {...{name}} />
+                  <Icon size={24} name={icons[key].name} color="white" />
                 </View>
               </Animated.View>
             </React.Fragment>
@@ -112,12 +150,20 @@ const styles = StyleSheet.create({
     height: tabHeight,
   },
   circle: {
-    backgroundColor: 'white',
-    width: 66,
-    height: 64,
-    borderRadius: 32,
+    backgroundColor: 'black',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    bottom: 10,
+    bottom: -10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.39,
+    shadowRadius: 8.3,
+    elevation: 13,
   },
 });
