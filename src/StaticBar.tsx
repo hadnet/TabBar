@@ -63,7 +63,6 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
               ? options.title
               : route.name;*/
 
-          console.log('state.index', state.index, 'key', key);
           const isFocused = state.index === key;
 
           const onPress = () => {
