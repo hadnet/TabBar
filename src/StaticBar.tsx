@@ -1,16 +1,11 @@
 import React from 'react';
 import {View, TouchableWithoutFeedback, StyleSheet, Animated, Dimensions} from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-import {FeatherIconName} from './Feather.type';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
-
-export type Icons = {
-  name: FeatherIconName;
-};
+import {FeatherIconName} from './Feather.type';
 
 interface StaticBarProps extends BottomTabBarProps {
   value: Animated.Value;
-  icons: Icons[];
 }
 
 export const TAB_HEIGHT = 56;
@@ -20,10 +15,24 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
   tabWidth = width / this.props.state.routes.length;
   values: Animated.Value[] = [];
 
+  middleTab(routes: number) {
+    return routes === 3 ? 1 : routes === 5 ? 2 : null;
+  }
+
+  componentDidMount() {
+    const {state, navigation} = this.props;
+    const idx = this.middleTab(state.routes.length);
+    state.routes.map((route, index) => {
+      index === idx && navigation.navigate(route.name);
+    });
+  }
+
   constructor(props: StaticBarProps) {
     super(props);
-    const {routes} = this.props.state;
-    this.values = routes.map((route, index) => new Animated.Value(index === 1 ? 1 : 0));
+    const {state} = this.props;
+    const idx = this.middleTab(state.routes.length);
+    if (!idx) throw new Error('Bottom tabs must be of 3 tabs or 5 tabs');
+    this.values = state.routes.map((_, index) => new Animated.Value(index === idx ? 1 : 0));
   }
 
   onPress = (index: number) => {
@@ -51,7 +60,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
   };
 
   render() {
-    const {/*descriptors, */ state, navigation, value, icons} = this.props;
+    const {/*descriptors, */ state, navigation, value} = this.props;
     return (
       <View style={styles.container}>
         {state.routes.map((route, key) => {
@@ -106,7 +115,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
             <React.Fragment key={key}>
               <TouchableWithoutFeedback {...{key}} onPress={onPress} onLongPress={onLongPress}>
                 <Animated.View style={[styles.tab, {opacity}]}>
-                  <Icon size={24} name={icons[key].name} color="white" />
+                  <Icon size={24} name={route.name as FeatherIconName} color="white" />
                 </Animated.View>
               </TouchableWithoutFeedback>
               <Animated.View
@@ -122,7 +131,7 @@ export default class StaticBar extends React.PureComponent<StaticBarProps> {
                 }}
               >
                 <View style={styles.circle}>
-                  <Icon size={24} name={icons[key].name} color="white" />
+                  <Icon size={24} name={route.name as FeatherIconName} color="white" />
                 </View>
               </Animated.View>
             </React.Fragment>

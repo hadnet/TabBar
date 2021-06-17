@@ -2,11 +2,9 @@ import React, {Component} from 'react';
 import {View, Dimensions, Animated, StyleSheet} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import * as shape from 'd3-shape';
-import StaticBar, {Icons, TAB_HEIGHT as HEIGHT} from './StaticBar';
+import StaticBar, {TAB_HEIGHT as HEIGHT} from './StaticBar';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 // import {SafeAreaProvider, Safe} from 'react-native-safe-area-context';
-
-const icons: Icons[] = [{name: 'menu'}, {name: 'plus'}, {name: 'search'}];
 
 const {width} = Dimensions.get('window');
 
@@ -53,12 +51,16 @@ const right = (width: number, tabWidth: number) =>
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
 export default class AppbarBottom extends Component<BottomTabBarProps> {
-  value = new Animated.Value(-width + width / this.props.state.routes.length);
+  value = new Animated.Value(
+    width / (this.props.state.routes.length === 5 ? 5 : width) -
+      width +
+      width / this.props.state.routes.length,
+  );
+
   render() {
     const {value: translateX} = this;
     const {state} = this.props;
     const tabFraction = width / state.routes.length;
-    icons.length = state.routes.length;
     const d = `${left(width)} ${tab(width - (CURVE_WIDTH - tabFraction) / 2, CURVE_WIDTH)} ${right(
       width,
       width,
@@ -69,7 +71,7 @@ export default class AppbarBottom extends Component<BottomTabBarProps> {
           <Path {...{d}} fill="#5723E4" />
         </AnimatedSvg>
         <View style={[StyleSheet.absoluteFill]}>
-          <StaticBar {...this.props} value={translateX} {...{icons}} />
+          <StaticBar {...this.props} value={translateX} />
         </View>
       </View>
     );

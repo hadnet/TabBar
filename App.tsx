@@ -10,6 +10,8 @@ type RootStackParamList = {
   First: undefined;
   Two: undefined;
   Three: undefined;
+  Fourth: undefined;
+  Fifth: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -28,6 +30,16 @@ const Two = () => (
 const Three = () => (
   <SafeAreaView style={{flex: 1, backgroundColor: 'powderblue'}}>
     <Text>Three</Text>
+  </SafeAreaView>
+);
+const Fourth = () => (
+  <SafeAreaView style={{flex: 1, backgroundColor: 'powderblue'}}>
+    <Text>Fourth</Text>
+  </SafeAreaView>
+);
+const Fifth = () => (
+  <SafeAreaView style={{flex: 1, backgroundColor: 'powderblue'}}>
+    <Text>Fifth</Text>
   </SafeAreaView>
 );
 
@@ -52,13 +64,32 @@ export function ThirdStack() {
     </Stack.Navigator>
   );
 }
+export function FourthStack() {
+  return (
+    <Stack.Navigator headerMode={'none'}>
+      <Stack.Screen name={'Fourth'} component={Fourth} />
+    </Stack.Navigator>
+  );
+}
+export function FifthStack() {
+  return (
+    <Stack.Navigator headerMode={'none'}>
+      <Stack.Screen name={'Fifth'} component={Fifth} />
+    </Stack.Navigator>
+  );
+}
 
 export function Navigation() {
   return (
-    <Tab.Navigator tabBar={(props: BottomTabBarProps) => <AppbarBottom {...props} />}>
-      <Tab.Screen name={'First'} component={FirstStack} />
-      <Tab.Screen name={'Two'} component={SecondStack} />
-      <Tab.Screen name={'Three'} component={ThirdStack} />
+    <Tab.Navigator
+      // initialRouteName="Two"
+      tabBar={(props: BottomTabBarProps) => <AppbarBottom {...props} />}
+    >
+      <Tab.Screen name={'menu'} component={FirstStack} />
+      <Tab.Screen name={'music'} component={SecondStack} />
+      <Tab.Screen name={'plus'} component={ThirdStack} />
+      <Tab.Screen name={'list'} component={FourthStack} />
+      <Tab.Screen name={'search'} component={FifthStack} />
     </Tab.Navigator>
   );
 }
