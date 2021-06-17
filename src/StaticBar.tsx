@@ -1,145 +1,169 @@
-import React from 'react';
-import {View, TouchableWithoutFeedback, StyleSheet, Animated, Dimensions} from 'react-native';
+import React, {useEffect} from 'react';
+import {View, TouchableWithoutFeedback, StyleSheet, Dimensions} from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {FeatherIconName} from './Feather.type';
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 interface StaticBarProps extends BottomTabBarProps {
-  value: Animated.Value;
+  value: Animated.SharedValue<number>;
 }
 
 export const TAB_HEIGHT = 56;
 const {width} = Dimensions.get('window');
 
-export default class StaticBar extends React.PureComponent<StaticBarProps> {
-  tabWidth = width / this.props.state.routes.length;
-  values: Animated.Value[] = [];
+export default function StaticBar(props: StaticBarProps) {
+  const tabWidth = width / props.state.routes.length;
+  let values: Animated.SharedValue<number>[] = [];
 
-  middleTab(routes: number) {
+  const middleTab = (routes: number) => {
     return routes === 3 ? 1 : routes === 5 ? 2 : null;
-  }
+  };
 
-  componentDidMount() {
-    const {state, navigation} = this.props;
-    const idx = this.middleTab(state.routes.length);
+  useEffect(() => {
+    const {state, navigation} = props;
+    const idx = middleTab(state.routes.length);
     state.routes.map((route, index) => {
       index === idx && navigation.navigate(route.name);
     });
-  }
+  }, []);
 
-  constructor(props: StaticBarProps) {
-    super(props);
-    const {state} = this.props;
-    const idx = this.middleTab(state.routes.length);
-    if (!idx) throw new Error('Bottom tabs must be of 3 tabs or 5 tabs');
-    this.values = state.routes.map((_, index) => new Animated.Value(index === idx ? 1 : 0));
-  }
+  const idx = middleTab(props.state.routes.length);
+  if (!idx) throw new Error('Bottom tabs must be of 3 tabs or 5 tabs');
+  const {routes} = props.state;
+  values = routes.map((route, index) => useSharedValue(index === idx ? 1 : 0));
 
-  onPress = (index: number) => {
-    const {value} = this.props;
-
-    Animated.sequence([
-      ...this.values.map(value =>
-        Animated.timing(value, {
-          toValue: 0,
-          duration: 10,
-          useNativeDriver: true,
-        }),
-      ),
-      Animated.parallel([
-        Animated.spring(this.values[index], {
-          toValue: 1,
-          useNativeDriver: true,
-        }),
-        Animated.spring(value, {
-          toValue: -width + this.tabWidth * index,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
+  const start = (index: number) => {
+    // Animated.withSequence([
+    //   ...this.values.map(value =>
+    //     Animated.timing(value, {
+    //       toValue: 0,
+    //       duration: 10,
+    //       useNativeDriver: true,
+    //     }),
+    //   ),
+    //   Animated.parallel([
+    //     Animated.spring(this.values[index], {
+    //       toValue: 1,
+    //       useNativeDriver: true,
+    //     }),
+    //     Animated.spring(value, {
+    //       toValue: -width + this.tabWidth * index,
+    //       useNativeDriver: true,
+    //     }),
+    //   ]),
+    // ]).start();
+    values.map(value => {
+      value.value = withTiming(0, {
+        duration: 10,
+      });
+    });
+    values[index].value = withSpring(1);
+    props.value.value = withSpring(-width + tabWidth * index);
   };
 
-  render() {
-    const {/*descriptors, */ state, navigation, value} = this.props;
-    return (
-      <View style={styles.container}>
-        {state.routes.map((route, key) => {
-          /*const {options} = descriptors[route.key];
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;*/
+  const {/*descriptors, */ state, navigation, value} = props;
+  return (
+    <View style={styles.container}>
+      {state.routes.map((route, key) => {
+        /*const {options} = descriptors[route.key];
+        const label =
+          options.tabBarLabel !== undefined
+            ? options.tabBarLabel
+            : options.title !== undefined
+            ? options.title
+            : route.name;*/
 
-          const isFocused = state.index === key;
+        const isFocused = state.index === key;
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
 
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-              this.onPress(key);
-            }
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+            start(key);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        const activeValue = values[key];
+
+        const opacityAnimatedStyle = useAnimatedStyle(() => {
+          return {
+            opacity: withTiming(
+              interpolate(
+                value.value,
+                [
+                  -width + tabWidth * (key - 1),
+                  -width + tabWidth * key,
+                  -width + tabWidth * (key + 1),
+                ],
+                [1, 0, 1],
+                Extrapolate.CLAMP,
+              ),
+            ),
           };
+        });
 
-          const onLongPress = () => {
-            navigation.emit({
-              type: 'tabLongPress',
-              target: route.key,
-            });
-          };
-
-          const activeValue = this.values[key];
-
-          const opacity = value.interpolate({
-            inputRange: [
-              -width + this.tabWidth * (key - 1),
-              -width + this.tabWidth * key,
-              -width + this.tabWidth * (key + 1),
+        const translateYAnimatedStyle = useAnimatedStyle(() => {
+          return {
+            transform: [
+              {
+                translateY: withSpring(
+                  interpolate(activeValue.value, [0, 1], [TAB_HEIGHT + 10, -18]),
+                ),
+              },
             ],
-            outputRange: [1, 0, 1],
-            extrapolate: 'clamp',
-          });
+          };
+        });
 
-          const translateY = activeValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [TAB_HEIGHT + 10, -18],
-          });
-
-          return (
-            <React.Fragment key={key}>
-              <TouchableWithoutFeedback {...{key}} onPress={onPress} onLongPress={onLongPress}>
-                <Animated.View style={[styles.tab, {opacity}]}>
-                  <Icon size={24} name={route.name as FeatherIconName} color="white" />
-                </Animated.View>
-              </TouchableWithoutFeedback>
-              <Animated.View
-                style={{
+        return (
+          <React.Fragment key={key}>
+            <TouchableWithoutFeedback {...{key}} onPress={onPress} onLongPress={onLongPress}>
+              <Animated.View style={[styles.tab, opacityAnimatedStyle]}>
+                <Icon size={24} name={route.name as FeatherIconName} color="white" />
+              </Animated.View>
+            </TouchableWithoutFeedback>
+            <Animated.View
+              style={[
+                {
                   position: 'absolute',
                   top: -20,
-                  width: this.tabWidth,
-                  left: this.tabWidth * key,
+                  width: tabWidth,
+                  left: tabWidth * key,
                   height: TAB_HEIGHT,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  transform: [{translateY}],
-                }}
-              >
-                <View style={styles.circle}>
-                  <Icon size={24} name={route.name as FeatherIconName} color="white" />
-                </View>
-              </Animated.View>
-            </React.Fragment>
-          );
-        })}
-      </View>
-    );
-  }
+                },
+                translateYAnimatedStyle,
+              ]}
+            >
+              <View style={styles.circle}>
+                <Icon size={24} name={route.name as FeatherIconName} color="white" />
+              </View>
+            </Animated.View>
+          </React.Fragment>
+        );
+      })}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

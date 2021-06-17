@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
-import {View, Dimensions, Animated, StyleSheet} from 'react-native';
+import React from 'react';
+import {View, Dimensions, StyleSheet} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import * as shape from 'd3-shape';
 import StaticBar, {TAB_HEIGHT as HEIGHT} from './StaticBar';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
+import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 // import {SafeAreaProvider, Safe} from 'react-native-safe-area-context';
 
 const {width} = Dimensions.get('window');
@@ -50,30 +51,28 @@ const right = (width: number, tabWidth: number) =>
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
-export default class AppbarBottom extends Component<BottomTabBarProps> {
-  value = new Animated.Value(
-    width / (this.props.state.routes.length === 5 ? 5 : width) -
+export default function AppbarBottom(props: BottomTabBarProps) {
+  const tabFraction = width / props.state.routes.length;
+  const translateX = useSharedValue<number>(
+    width / (props.state.routes.length === 5 ? 5 : width) -
       width +
-      width / this.props.state.routes.length,
+      width / props.state.routes.length,
   );
-
-  render() {
-    const {value: translateX} = this;
-    const {state} = this.props;
-    const tabFraction = width / state.routes.length;
-    const d = `${left(width)} ${tab(width - (CURVE_WIDTH - tabFraction) / 2, CURVE_WIDTH)} ${right(
-      width,
-      width,
-    )}`;
-    return (
-      <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
-        <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={{transform: [{translateX}]}}>
-          <Path {...{d}} fill="#5723E4" />
-        </AnimatedSvg>
-        <View style={[StyleSheet.absoluteFill]}>
-          <StaticBar {...this.props} value={translateX} />
-        </View>
+  const animatedStyle = useAnimatedStyle(() => {
+    return {transform: [{translateX: translateX.value}]};
+  });
+  const d = `${left(width)} ${tab(width - (CURVE_WIDTH - tabFraction) / 2, CURVE_WIDTH)} ${right(
+    width,
+    width,
+  )}`;
+  return (
+    <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
+      <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={animatedStyle}>
+        <Path {...{d}} fill="#5723E4" />
+      </AnimatedSvg>
+      <View style={[StyleSheet.absoluteFill]}>
+        <StaticBar {...props} value={translateX} />
       </View>
-    );
-  }
+    </View>
+  );
 }
