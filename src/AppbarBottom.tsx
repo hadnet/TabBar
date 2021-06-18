@@ -58,7 +58,7 @@ export default function AppbarBottom(props: BottomTabBarProps) {
       width +
       width / props.state.routes.length,
   );
-  const animatedStyle = useAnimatedStyle(() => {
+  const translateXAnimatedStyle = useAnimatedStyle(() => {
     return {transform: [{translateX: translateX.value}]};
   });
   const d = `${left(width)} ${tab(width - (CURVE_WIDTH - tabFraction) / 2, CURVE_WIDTH)} ${right(
@@ -67,11 +67,11 @@ export default function AppbarBottom(props: BottomTabBarProps) {
   )}`;
   return (
     <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
-      <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={animatedStyle}>
+      <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={translateXAnimatedStyle}>
         <Path {...{d}} fill="#5723E4" />
       </AnimatedSvg>
       <View style={[StyleSheet.absoluteFill]}>
-        <StaticBar {...props} value={translateX} />
+        <StaticBar {...props} staticBarTranslateX={translateX} />
       </View>
     </View>
   );

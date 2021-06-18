@@ -13,66 +13,47 @@ import Animated, {
 } from 'react-native-reanimated';
 
 interface StaticBarProps extends BottomTabBarProps {
-  value: Animated.SharedValue<number>;
+  staticBarTranslateX: Animated.SharedValue<number>;
 }
 
 export const TAB_HEIGHT = 56;
 const {width} = Dimensions.get('window');
 
 export default function StaticBar(props: StaticBarProps) {
-  const tabWidth = width / props.state.routes.length;
-  let values: Animated.SharedValue<number>[] = [];
+  const {/*descriptors, */ state, navigation, staticBarTranslateX} = props;
+  const {routes} = props.state;
+  const tabWidth = width / routes.length;
+  let circleBtns: Animated.SharedValue<number>[] = [];
 
   const middleTab = (routes: number) => {
     return routes === 3 ? 1 : routes === 5 ? 2 : null;
   };
 
   useEffect(() => {
-    const {state, navigation} = props;
-    const idx = middleTab(state.routes.length);
-    state.routes.map((route, index) => {
+    const idx = middleTab(routes.length);
+    routes.map((route, index) => {
       index === idx && navigation.navigate(route.name);
     });
   }, []);
 
-  const idx = middleTab(props.state.routes.length);
+  const idx = middleTab(routes.length);
   if (!idx) throw new Error('Bottom tabs must be of 3 tabs or 5 tabs');
-  const {routes} = props.state;
-  values = routes.map((route, index) => useSharedValue(index === idx ? 1 : 0));
+
+  circleBtns = routes.map((_, index) => useSharedValue(index === idx ? 1 : 0));
 
   const start = (index: number) => {
-    // Animated.withSequence([
-    //   ...this.values.map(value =>
-    //     Animated.timing(value, {
-    //       toValue: 0,
-    //       duration: 10,
-    //       useNativeDriver: true,
-    //     }),
-    //   ),
-    //   Animated.parallel([
-    //     Animated.spring(this.values[index], {
-    //       toValue: 1,
-    //       useNativeDriver: true,
-    //     }),
-    //     Animated.spring(value, {
-    //       toValue: -width + this.tabWidth * index,
-    //       useNativeDriver: true,
-    //     }),
-    //   ]),
-    // ]).start();
-    values.map(value => {
-      value.value = withTiming(0, {
+    circleBtns.map(circleBtn => {
+      circleBtn.value = withTiming(0, {
         duration: 10,
       });
     });
-    values[index].value = withSpring(1);
-    props.value.value = withSpring(-width + tabWidth * index);
+    circleBtns[index].value = withSpring(1);
+    staticBarTranslateX.value = withSpring(-width + tabWidth * index);
   };
 
-  const {/*descriptors, */ state, navigation, value} = props;
   return (
     <View style={styles.container}>
-      {state.routes.map((route, key) => {
+      {routes.map((route, key) => {
         /*const {options} = descriptors[route.key];
         const label =
           options.tabBarLabel !== undefined
@@ -103,13 +84,13 @@ export default function StaticBar(props: StaticBarProps) {
           });
         };
 
-        const activeValue = values[key];
+        const circleBtnActive = circleBtns[key];
 
         const opacityAnimatedStyle = useAnimatedStyle(() => {
           return {
             opacity: withTiming(
               interpolate(
-                value.value,
+                staticBarTranslateX.value,
                 [
                   -width + tabWidth * (key - 1),
                   -width + tabWidth * key,
@@ -118,6 +99,7 @@ export default function StaticBar(props: StaticBarProps) {
                 [1, 0, 1],
                 Extrapolate.CLAMP,
               ),
+              {duration: 10},
             ),
           };
         });
@@ -127,7 +109,13 @@ export default function StaticBar(props: StaticBarProps) {
             transform: [
               {
                 translateY: withSpring(
-                  interpolate(activeValue.value, [0, 1], [TAB_HEIGHT + 10, -18]),
+                  interpolate(circleBtnActive.value, [0, 1], [TAB_HEIGHT + 12, -18]),
+                  {
+                    stiffness: 300,
+                    damping: 10,
+                    mass: 0.1,
+                    overshootClamping: true,
+                  },
                 ),
               },
             ],
@@ -144,13 +132,10 @@ export default function StaticBar(props: StaticBarProps) {
             <Animated.View
               style={[
                 {
-                  position: 'absolute',
-                  top: -20,
-                  width: tabWidth,
+                  ...styles.circleWrapper,
                   left: tabWidth * key,
+                  width: tabWidth,
                   height: TAB_HEIGHT,
-                  justifyContent: 'center',
-                  alignItems: 'center',
                 },
                 translateYAnimatedStyle,
               ]}
@@ -176,14 +161,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: TAB_HEIGHT,
   },
-  circle: {
-    backgroundColor: 'black',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  circleWrapper: {
+    position: 'absolute',
+    top: -20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  circle: {
+    width: 56,
+    height: 56,
     bottom: -10,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'black',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
