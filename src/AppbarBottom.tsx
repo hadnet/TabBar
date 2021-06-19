@@ -6,13 +6,15 @@ import StaticBar, {TAB_HEIGHT as HEIGHT} from './StaticBar';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 
+export type AppbarBottomColorProps = {
+  bar: string;
+  fab: string;
+  icon: string;
+  activeIcon?: string;
+};
+
 export type AppbarBottomProps = {
-  colors: {
-    icon: string;
-    button: string;
-    active: string;
-    background: string;
-  };
+  color: AppbarBottomColorProps;
 };
 
 const {width} = Dimensions.get('window');
@@ -62,7 +64,7 @@ const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 export default function AppbarBottom(props: BottomTabBarProps & AppbarBottomProps) {
   const {
     state,
-    colors: {background},
+    color: {bar},
   } = props;
   const tabFraction = width / state.routes.length;
   const translateX = useSharedValue<number>(
@@ -80,14 +82,14 @@ export default function AppbarBottom(props: BottomTabBarProps & AppbarBottomProp
       <View>
         <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
           <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={translateXAnimatedStyle}>
-            <Path {...{d}} fill={background} />
+            <Path {...{d}} fill={bar} />
           </AnimatedSvg>
           <View style={[StyleSheet.absoluteFill]}>
             <StaticBar {...props} staticBarTranslateX={translateX} />
           </View>
         </View>
       </View>
-      <SafeAreaView style={{backgroundColor: background}} />
+      <SafeAreaView style={{backgroundColor: bar}} />
     </>
   );
 }

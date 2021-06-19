@@ -96,10 +96,7 @@ export function Navigation() {
     <Tab.Navigator
       // initialRouteName="Two"
       tabBar={(props: BottomTabBarProps) => (
-        <AppbarBottom
-          colors={{background: '#5723E4', button: 'black', active: 'pink', icon: 'white'}}
-          {...props}
-        />
+        <AppbarBottom color={{bar: '#5723E4', fab: 'black', icon: 'white'}} {...props} />
       )}
     >
       <Tab.Screen name={'menu'} component={FirstStack} />

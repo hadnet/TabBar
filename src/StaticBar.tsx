@@ -26,7 +26,7 @@ export default function StaticBar(props: StaticBarProps & AppbarBottomProps) {
     /*descriptors, */ state,
     navigation,
     staticBarTranslateX,
-    colors: {button, active, icon},
+    color: {fab, activeIcon, icon},
   } = props;
   const {routes} = props.state;
   const tabWidth = width / routes.length;
@@ -54,8 +54,12 @@ export default function StaticBar(props: StaticBarProps & AppbarBottomProps) {
         duration: 1,
       });
     });
-    circleBtns[index].value = withSpring(1);
-    staticBarTranslateX.value = withSpring(-width + tabWidth * index);
+    circleBtns[index].value = withSpring(1, {
+      stiffness: 300,
+      damping: 100,
+      overshootClamping: true,
+    });
+    staticBarTranslateX.value = withTiming(-width + tabWidth * index);
   };
 
   return (
@@ -153,11 +157,11 @@ export default function StaticBar(props: StaticBarProps & AppbarBottomProps) {
                 style={[
                   styles.circle,
                   {
-                    backgroundColor: button,
+                    backgroundColor: fab,
                   },
                 ]}
               >
-                <Icon size={24} name={route.name as FeatherIconName} color={active} />
+                <Icon size={24} name={route.name as FeatherIconName} color={activeIcon ?? icon} />
               </View>
             </Animated.View>
           </React.Fragment>
