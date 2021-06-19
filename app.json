@@ -2,6 +2,7 @@
   "name": "MaterialAppBarBottomInsetFAB",
   "displayName": "MaterialAppBarBottomInsetFAB",
   "expo": {
+    "orientation": "portrait",
     "name": "MaterialAppBarBottomInsetFAB",
     "slug": "MaterialAppBarBottomInsetFAB",
     "version": "1.0.0",

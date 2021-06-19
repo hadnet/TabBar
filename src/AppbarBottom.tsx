@@ -1,11 +1,19 @@
 import React from 'react';
-import {View, Dimensions, StyleSheet} from 'react-native';
+import {View, Dimensions, StyleSheet, SafeAreaView} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import * as shape from 'd3-shape';
 import StaticBar, {TAB_HEIGHT as HEIGHT} from './StaticBar';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
-// import {SafeAreaProvider, Safe} from 'react-native-safe-area-context';
+
+export type AppbarBottomProps = {
+  colors: {
+    icon: string;
+    button: string;
+    active: string;
+    background: string;
+  };
+};
 
 const {width} = Dimensions.get('window');
 
@@ -51,12 +59,14 @@ const right = (width: number, tabWidth: number) =>
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
-export default function AppbarBottom(props: BottomTabBarProps) {
-  const tabFraction = width / props.state.routes.length;
+export default function AppbarBottom(props: BottomTabBarProps & AppbarBottomProps) {
+  const {
+    state,
+    colors: {background},
+  } = props;
+  const tabFraction = width / state.routes.length;
   const translateX = useSharedValue<number>(
-    width / (props.state.routes.length === 5 ? 5 : width) -
-      width +
-      width / props.state.routes.length,
+    width / (state.routes.length === 5 ? 5 : width) - width + width / state.routes.length,
   );
   const translateXAnimatedStyle = useAnimatedStyle(() => {
     return {transform: [{translateX: translateX.value}]};
@@ -66,13 +76,18 @@ export default function AppbarBottom(props: BottomTabBarProps) {
     width,
   )}`;
   return (
-    <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
-      <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={translateXAnimatedStyle}>
-        <Path {...{d}} fill="#5723E4" />
-      </AnimatedSvg>
-      <View style={[StyleSheet.absoluteFill]}>
-        <StaticBar {...props} staticBarTranslateX={translateX} />
+    <>
+      <View>
+        <View {...{width, height: HEIGHT}} style={{position: 'absolute', bottom: 0}}>
+          <AnimatedSvg width={width * 2.5} {...{height: HEIGHT}} style={translateXAnimatedStyle}>
+            <Path {...{d}} fill={background} />
+          </AnimatedSvg>
+          <View style={[StyleSheet.absoluteFill]}>
+            <StaticBar {...props} staticBarTranslateX={translateX} />
+          </View>
+        </View>
       </View>
-    </View>
+      <SafeAreaView style={{backgroundColor: background}} />
+    </>
   );
 }

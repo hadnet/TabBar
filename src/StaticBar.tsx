@@ -4,6 +4,7 @@ import {Feather as Icon} from '@expo/vector-icons';
 import {FeatherIconName} from './Feather.type';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import Animated, {
+  Easing,
   Extrapolate,
   interpolate,
   useAnimatedStyle,
@@ -11,6 +12,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import type {AppbarBottomProps} from './AppbarBottom';
 
 interface StaticBarProps extends BottomTabBarProps {
   staticBarTranslateX: Animated.SharedValue<number>;
@@ -19,8 +21,13 @@ interface StaticBarProps extends BottomTabBarProps {
 export const TAB_HEIGHT = 56;
 const {width} = Dimensions.get('window');
 
-export default function StaticBar(props: StaticBarProps) {
-  const {/*descriptors, */ state, navigation, staticBarTranslateX} = props;
+export default function StaticBar(props: StaticBarProps & AppbarBottomProps) {
+  const {
+    /*descriptors, */ state,
+    navigation,
+    staticBarTranslateX,
+    colors: {button, active, icon},
+  } = props;
   const {routes} = props.state;
   const tabWidth = width / routes.length;
   let circleBtns: Animated.SharedValue<number>[] = [];
@@ -44,7 +51,7 @@ export default function StaticBar(props: StaticBarProps) {
   const start = (index: number) => {
     circleBtns.map(circleBtn => {
       circleBtn.value = withTiming(0, {
-        duration: 10,
+        duration: 1,
       });
     });
     circleBtns[index].value = withSpring(1);
@@ -99,7 +106,10 @@ export default function StaticBar(props: StaticBarProps) {
                 [1, 0, 1],
                 Extrapolate.CLAMP,
               ),
-              {duration: 10},
+              {
+                duration: 0.01,
+                easing: Easing.inOut(Easing.ease),
+              },
             ),
           };
         });
@@ -109,7 +119,7 @@ export default function StaticBar(props: StaticBarProps) {
             transform: [
               {
                 translateY: withSpring(
-                  interpolate(circleBtnActive.value, [0, 1], [TAB_HEIGHT + 12, -18]),
+                  interpolate(circleBtnActive.value, [0, 1], [TAB_HEIGHT, -34]),
                   {
                     stiffness: 300,
                     damping: 10,
@@ -126,7 +136,7 @@ export default function StaticBar(props: StaticBarProps) {
           <React.Fragment key={key}>
             <TouchableWithoutFeedback {...{key}} onPress={onPress} onLongPress={onLongPress}>
               <Animated.View style={[styles.tab, opacityAnimatedStyle]}>
-                <Icon size={24} name={route.name as FeatherIconName} color="white" />
+                <Icon size={24} name={route.name as FeatherIconName} color={icon} />
               </Animated.View>
             </TouchableWithoutFeedback>
             <Animated.View
@@ -135,13 +145,19 @@ export default function StaticBar(props: StaticBarProps) {
                   ...styles.circleWrapper,
                   left: tabWidth * key,
                   width: tabWidth,
-                  height: TAB_HEIGHT,
                 },
                 translateYAnimatedStyle,
               ]}
             >
-              <View style={styles.circle}>
-                <Icon size={24} name={route.name as FeatherIconName} color="white" />
+              <View
+                style={[
+                  styles.circle,
+                  {
+                    backgroundColor: button,
+                  },
+                ]}
+              >
+                <Icon size={24} name={route.name as FeatherIconName} color={active} />
               </View>
             </Animated.View>
           </React.Fragment>
@@ -162,19 +178,19 @@ const styles = StyleSheet.create({
     height: TAB_HEIGHT,
   },
   circleWrapper: {
+    top: 6,
+    height: TAB_HEIGHT,
     position: 'absolute',
-    top: -20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   circle: {
     width: 56,
     height: 56,
-    bottom: -10,
+    bottom: 0,
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'black',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
