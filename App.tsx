@@ -24,21 +24,21 @@ const First = () => (
   <SafeAreaView
     style={{flex: 1, backgroundColor: '#EA3B91', alignItems: 'center', justifyContent: 'center'}}
   >
-    <Text>One</Text>
+    <Text>First</Text>
   </SafeAreaView>
 );
 const Two = () => (
   <SafeAreaView
     style={{flex: 1, backgroundColor: '#4773EC', alignItems: 'center', justifyContent: 'center'}}
   >
-    <Text>Two</Text>
+    <Text>Second</Text>
   </SafeAreaView>
 );
 const Three = () => (
   <SafeAreaView
     style={{flex: 1, backgroundColor: '#00effe', alignItems: 'center', justifyContent: 'center'}}
   >
-    <Text>Three</Text>
+    <Text>Third</Text>
   </SafeAreaView>
 );
 const Fourth = () => (
