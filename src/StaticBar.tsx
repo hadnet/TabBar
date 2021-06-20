@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {View, TouchableWithoutFeedback, StyleSheet, Dimensions} from 'react-native';
-import {Feather as Icon} from '@expo/vector-icons';
-import {FeatherIconName} from './Feather.type';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {MCIcons} from './MaterialCommunityIcons.type';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import Animated, {
   Easing,
@@ -140,7 +140,7 @@ export default function StaticBar(props: StaticBarProps & AppbarBottomProps) {
           <React.Fragment key={key}>
             <TouchableWithoutFeedback {...{key}} onPress={onPress} onLongPress={onLongPress}>
               <Animated.View style={[styles.tab, opacityAnimatedStyle]}>
-                <Icon size={24} name={route.name as FeatherIconName} color={icon} />
+                <MaterialCommunityIcons size={24} name={route.name as MCIcons} color={icon} />
               </Animated.View>
             </TouchableWithoutFeedback>
             <Animated.View
@@ -161,7 +161,11 @@ export default function StaticBar(props: StaticBarProps & AppbarBottomProps) {
                   },
                 ]}
               >
-                <Icon size={24} name={route.name as FeatherIconName} color={activeIcon ?? icon} />
+                <MaterialCommunityIcons
+                  size={24}
+                  name={route.name as MCIcons}
+                  color={activeIcon ?? icon}
+                />
               </View>
             </Animated.View>
           </React.Fragment>

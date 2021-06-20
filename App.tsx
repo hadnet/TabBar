@@ -6,6 +6,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {BottomTabBarProps, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import {useEffect} from 'react';
+import {MCIcons} from './src/MaterialCommunityIcons.type';
 // import {SafeAreaProvider, useSafeArea} from 'react-native-safe-area-context';
 
 type RootStackParamList = {
@@ -17,7 +18,7 @@ type RootStackParamList = {
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<{[k in MCIcons]: undefined}>();
 
 const First = () => (
   <SafeAreaView
@@ -102,8 +103,8 @@ export function Navigation() {
       <Tab.Screen name={'menu'} component={FirstStack} />
       <Tab.Screen name={'music'} component={SecondStack} />
       <Tab.Screen name={'plus'} component={ThirdStack} />
-      <Tab.Screen name={'list'} component={FourthStack} />
-      <Tab.Screen name={'search'} component={FifthStack} />
+      <Tab.Screen name={'account'} component={FourthStack} />
+      <Tab.Screen name={'magnify'} component={FifthStack} />
     </Tab.Navigator>
   );
 }
