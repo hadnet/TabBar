@@ -1,4 +1,4 @@
-export type MCIcons =
+export type MCIconsNames =
   | 'function'
   | 'head'
   | 'link'

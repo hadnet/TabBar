@@ -1,46 +1,56 @@
 {
-  "main": "index.js",
+  "name": "appbar-bottom-inset-fab",
+  "version": "1.0.0",
+  "description": "An animated bottom tab navigation for React Native, inspired by the Material Design Appbar bottom inset FAB, using Reanimated v2 and React Navigation v5",
+  "license": "MIT",
+  "keywords": [
+    "bottom tab",
+    "React Native",
+    "Material Design",
+    "React Navigation",
+    "menu bar",
+    "appbar"
+  ],
+  "author": "hadnet",
+  "main": "lib/module/index.js",
+  "module": "lib/module/index.js",
+  "react-native": "src/index.tsx",
+  "source": "src/index.tsx",
+  "types": "lib/typescript/index.d.ts",
+  "files": [
+    "lib/",
+    "src/"
+  ],
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "web": "expo start --web",
-    "start": "env REACT_DEBUGGER=\"$([ -d '/Applications/React Native Debugger.app' ] && echo \"open 'rndebugger://set-debugger-loc?host=localhost&port=8081' --args\")\" react-native start",
     "lint": "eslint --ext .tsx --ext .ts ./src",
     "format": "prettier --check ./src",
-    "test": "jest"
+    "build": "bob build",
+    "test": "jest",
+    "release": "release-it"
   },
   "dependencies": {
-    "@react-native-community/masked-view": "0.1.10",
-    "@react-navigation/bottom-tabs": "^5.11.11",
-    "@react-navigation/native": "^5.9.4",
-    "@react-navigation/stack": "^5.14.5",
-    "d3-shape": "^3.0.1",
-    "expo": "~41.0.1",
-    "expo-screen-orientation": "~3.1.0",
-    "expo-splash-screen": "~0.10.2",
-    "expo-updates": "~0.5.4",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-native": "~0.63.4",
-    "react-native-device-info": "^8.1.3",
-    "react-native-gesture-handler": "~1.10.2",
-    "react-native-reanimated": "~2.1.0",
-    "react-native-safe-area-context": "3.2.0",
-    "react-native-screens": "~3.0.0",
-    "react-native-svg": "12.1.0",
-    "react-native-unimodules": "~0.13.3",
-    "react-native-web": "~0.13.12"
+    "d3-shape": "^3.0.1"
+  },
+  "peerDependencies": {
+    "@expo/vector-icons": ">=12.0.5",
+    "@react-native-community/masked-view": ">=0.1.10",
+    "@react-navigation/bottom-tabs": ">=5.11.11",
+    "@react-navigation/native": ">=5.9.4",
+    "react": ">=16.13.1",
+    "react-native": ">=0.63.4",
+    "react-native-gesture-handler": ">=1.10.2",
+    "react-native-reanimated": ">=2.1.0",
+    "react-native-svg": ">=12.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@react-native-community/bob": "^0.17.1",
     "@types/d3-shape": "^2.1.0",
     "@types/react": "~16.9.35",
     "@types/react-native": "~0.63.2",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
     "@typescript-eslint/parser": "^4.26.1",
-    "babel-preset-expo": "~8.3.0",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "^7.28.0",
@@ -48,9 +58,9 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "4.3.6",
-    "jest-expo": "~41.0.0",
     "lint-staged": "^11.0.0",
     "prettier": "^2.3.1",
+    "release-it": "^14.10.0",
     "typescript": "~4.0.0"
   },
   "husky": {
@@ -73,5 +83,13 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "@react-native-community/bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "module",
+      "typescript"
+    ]
   }
 }

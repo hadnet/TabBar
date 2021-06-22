@@ -2,6 +2,10 @@
 #
 .DS_Store
 
+# generated files by Bob
+dist/
+lib/
+
 # Xcode
 #
 build/

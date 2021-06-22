@@ -2,9 +2,9 @@ import React from 'react';
 import {View, Dimensions, StyleSheet, SafeAreaView} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import * as shape from 'd3-shape';
-import StaticBar, {TAB_HEIGHT as HEIGHT} from './StaticBar';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
+import StaticBar, {TAB_HEIGHT as HEIGHT} from './StaticBar';
 
 export type AppbarBottomColorProps = {
   bar: string;
