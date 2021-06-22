@@ -1,6 +1,9 @@
 {
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "name": "appbar-bottom-inset-fab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An animated bottom tab navigation for React Native, inspired by the Material Design Appbar bottom inset FAB, using Reanimated v2 and React Navigation v5",
   "license": "MIT",
   "keywords": [
@@ -26,7 +29,7 @@
     "format": "prettier --check ./src",
     "build": "bob build",
     "test": "jest",
-    "release": "dotenv release-it --"
+    "release": "HUSKY_SKIP_HOOKS=1 dotenv release-it"
   },
   "dependencies": {
     "d3-shape": "^3.0.1"

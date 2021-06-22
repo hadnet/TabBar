@@ -1,8 +1,5 @@
 {
   "github": {
     "release": true
-  },
-  "hooks": {
-    "after:bump": "auto-changelog -p --ignore-commit-pattern \"^chore: release v\""
   }
 }
