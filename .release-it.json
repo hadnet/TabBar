@@ -2,6 +2,10 @@
   "github": {
     "release": true
   },
+  "npm": {
+    "publish": false,
+    "skipChecks": false
+  },
   "plugins": {
     "@release-it/conventional-changelog": {
       "infile": "CHANGELOG.md",
